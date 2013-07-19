@@ -1,4 +1,4 @@
-import ctypes, _ctypes
+from ctypes import *
 from ctypes import wintypes
 from defines import *
 
@@ -18,7 +18,7 @@ class debugger():
         startupinfo.dwFlags = 0x1
         startupinfo.wShowWindow = 0x0
 
-        startupinfo.cb = sizeof(startupinfo)
+        startupinfo.cb = ctypes.sizeof(startupinfo)
 
         kernel32.CreateProcessW.restype = wintypes.BOOL
         kernel32.OpenProcess.argtypes = [
@@ -33,10 +33,10 @@ class debugger():
             wintypes.LPVOID     # lpProcessInformation 
         ]
 
-        packed_malware = input("Enter the path of the file to unpack: ")
-        print("The malware entered is: %s" % packed_malware)
+        #packed_malware = input("Enter the path of the file to unpack: ")
+        #print("The malware entered is: %s" % packed_malware)
 
-        if kernel32.CreateProcessW(path_to_exe,
+        if kernel32.CreateProcessW(path_to_malware,
                                     None,
                                     None,
                                     None,
@@ -44,8 +44,8 @@ class debugger():
                                     creation_flags,
                                     None,
                                     None,
-                                    POINTER(startupinfo),
-                                    POINTER(process_info)):
+                                    byref(startupinfo),
+                                    byref(process_info)):
             print("Sucessfully created process")
         else:
             createProcessError = ctypes.WinError(ctypes.get_last_error())

@@ -6,7 +6,7 @@
     <ProjectGuid>1200378c-d140-41a2-b8f5-f21c413c4939</ProjectGuid>
     <ProjectHome>
     </ProjectHome>
-    <StartupFile>debugger.py</StartupFile>
+    <StartupFile>unpack.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -25,6 +25,7 @@
   <ItemGroup>
     <Compile Include="debugger.py" />
     <Compile Include="defines.py" />
+    <Compile Include="unpack.py" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
 </Project>

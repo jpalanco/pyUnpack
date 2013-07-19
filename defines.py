@@ -44,10 +44,10 @@ class STARTUPINFO(ctypes.Structure):
                 ("hStdI",       HANDLE),
                 ]
 
-    class PROCESS_INFORMATION(ctypes.Structure):
+class PROCESS_INFORMATION(ctypes.Structure):
         _fields_ = [
-                    ("hProcess",    HANDLE),
-                    ("hThread",     HANDLE),
-                    ("dwProcessId", DWORD),
-                    ("dwThreadId",  DWORD),
-                    ]
+                ("hProcess",    HANDLE),
+                ("hThread",     HANDLE),
+                ("dwProcessId", DWORD),
+                ("dwThreadId",  DWORD),
+                ]
