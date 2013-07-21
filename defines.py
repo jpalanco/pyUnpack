@@ -51,3 +51,45 @@ class PROCESS_INFORMATION(ctypes.Structure):
                 ("dwProcessId", DWORD),
                 ("dwThreadId",  DWORD),
                 ]
+
+kernel32 = ctypes.WinDLL('kernel32.dll', use_last_error=True)
+
+kernel32.OpenProcess.restype = wintypes.HANDLE
+kernel32.OpenProcess.argtypes = [
+    wintypes.DWORD, # dwDesiredAccess
+    wintypes.BOOL,  # bInheritHandle
+    wintypes.DWORD, # dwProcessId
+]
+kernel32.VirtualAllocEx.restype = wintypes.LPVOID
+kernel32.VirtualAllocEx.argtypes = [
+    wintypes.HANDLE, # hProcess
+    wintypes.LPVOID, # lpAddress
+    SIZE_T, # dwSize
+    wintypes.DWORD,  # flAllocationType
+    wintypes.DWORD, # flProtect
+]
+kernel32.VirtualFreeEx.restype = wintypes.BOOL
+kernel32.VirtualFreeEx.argtypes = [
+    wintypes.HANDLE, # hProcess
+    wintypes.LPVOID, # lpAddress
+    SIZE_T, # dwSize
+    wintypes.DWORD,  # dwFreeType
+]
+kernel32.WriteProcessMemory.restype = wintypes.BOOL
+kernel32.WriteProcessMemory.argtypes = [
+    wintypes.HANDLE,  # hProcess
+    wintypes.LPVOID,  # lpBaseAddress
+    wintypes.LPCVOID, # lpBuffer
+    SIZE_T,  # nSize
+    ctypes.POINTER(SIZE_T), # lpNumberOfBytesWritten _Out_
+]
+kernel32.CreateRemoteThread.restype = wintypes.HANDLE
+kernel32.CreateRemoteThread.argtypes = [
+    wintypes.HANDLE,  # hProcess
+    LPSECURITY_ATTRIBUTES,  # lpThreadAttributes
+    SIZE_T,  # dwStackSize
+    LPTHREAD_START_ROUTINE, # lpStartAddress
+    wintypes.LPVOID,  # lpParameter
+    wintypes.DWORD,   # dwCreationFlags
+    wintypes.LPDWORD, # lpThreadId _Out_
+]

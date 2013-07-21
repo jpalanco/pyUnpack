@@ -6,7 +6,9 @@ kernel32 = ctypes.WinDLL('kernel32.dll')
 
 class debugger():
     def __init__(self):
-        pass
+        self.hProcess           =   None
+        self.pid                =   None
+        self.debugger_active    =   None
 
 
     def load(self, path_to_malware):
@@ -36,7 +38,7 @@ class debugger():
         #packed_malware = input("Enter the path of the file to unpack: ")
         #print("The malware entered is: %s" % packed_malware)
 
-        if kernel32.CreateProcessW(path_to_malware,
+        bCreateProcessW = kernel32.CreateProcessW(path_to_malware,
                                     None,
                                     None,
                                     None,
@@ -45,8 +47,20 @@ class debugger():
                                     None,
                                     None,
                                     byref(startupinfo),
-                                    byref(process_info)):
-            print("Sucessfully created process")
-        else:
+                                    byref(process_info))
+
+        if bCreateProcessW is None:
             createProcessError = ctypes.WinError(ctypes.get_last_error())
-            print("The CreateProcessW error was: %s" % createProcessError)
+            print("Could not CreateProcessW: " + path_to_malware + " the getLastError() is: " + createProcessError)
+            system.exit(1)
+
+        print("\n")
+        print("[+] sucessfully launched process with the PID: %s" % process_info.dwProcessId)
+        print("[+] injecting dll...")
+        #self.hProcess = self.open_process(process_info.dwProcessId)
+        print("[+] acquired a handle to the process!")
+
+    def open_process(self, pid):
+        hProcess = kernel32.OpenProcess(PROCESS_ALL_ACCESS, pid, false)
+        return hProcess
+        
