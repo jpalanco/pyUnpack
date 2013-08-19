@@ -11,6 +11,7 @@ PAGE_READWRITE = 0x0004
 INFINITE = -1
 
 written = ctypes.c_int(0)
+thread_id = ctypes.c_ulong(0)
 
 DEBUG_PROCESS = 0x00000001
 CREATE_NEW_PROCESS_DEBUG = 0x00000010
@@ -108,6 +109,11 @@ kernel32.CreateRemoteThread.argtypes = [
     wintypes.LPVOID,  # lpParameter
     wintypes.DWORD,   # dwCreationFlags
     wintypes.LPDWORD, # lpThreadId _Out_
+]
+
+kernel32.ResumeThread.restype = wintypes.DWORD
+kernel32.ResumeThread.argtypes = [
+    wintypes.HANDLE,    #hThread
 ]
 
 kernel32.TerminateProcess.restype = wintypes.BOOL
