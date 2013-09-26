@@ -17,6 +17,9 @@ class debugger():
 
         startupinfo     = STARTUPINFO()
         process_info    = PROCESS_INFORMATION()
+        image_dos_header = IMAGE_DOS_HEADER()
+
+        ptr_to_image_dos_header = ctypes.POINTER(IMAGE_DOS_HEADER)
 
         startupinfo.dwFlags = 0x1
         startupinfo.wShowWindow = 0x0
@@ -122,6 +125,21 @@ class debugger():
             system.exit(1)
         
         print("[+] successfully ran the injected dll")
+
+        print("[+] dereferencing to get the IAT...")
+
+        hModule = kernel32.GetModuleHandleW(0)
+
+        if hModule == 0:
+            hModule_Error = ctypes.WinError(ctypes.get_last_error())
+            print("[-] error getting the hModule to the running process " + hModule)
+            system.exit(1)
+
+        print("[+] The address for the kernel handle is %s" % hex(hModule))
+
+        ptr_to_image_dos_header = ctypes.cast(hModule, ctypes.POINTER(IMAGE_DOS_HEADER)).contents
+
+        print("[+] successfully got the address to the IAT")
 
         print("[+] patching the import address table to hook the API...")
 

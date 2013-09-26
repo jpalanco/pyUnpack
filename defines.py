@@ -9,6 +9,7 @@ MEM_COMMIT = 0x1000
 MEM_RELEASE = 0x8000
 PAGE_READWRITE = 0x0004
 INFINITE = -1
+NULL = 0
 
 written = ctypes.c_int(0)
 thread_id = ctypes.c_ulong(0)
@@ -57,14 +58,54 @@ class PROCESS_INFORMATION(ctypes.Structure):
                 ("dwThreadId",  DWORD),
                 ]
 
+class IMAGE_DOS_HEADER(ctypes.Structure):
+        _fields_ = [
+                ("e_magic",    WORD),
+                ("e_cblp",     WORD),
+                ("e_cp",       WORD),
+                ("e_crlc",     WORD),
+                ("e_cparhdr",  WORD),
+                ("e_minalloc", WORD),
+                ("e_maxalloc", WORD),
+                ("e_ss",       WORD),
+                ("e_sp",       WORD),
+                ("e_csum",     WORD),
+                ("e_ip",       WORD),
+                ("e_cs",       WORD),
+                ("e_lfarlc",   WORD),
+                ("e_ovno",     WORD),
+                ("e_res",      WORD * 4),
+                #WORD e_res[4];
+                ("e_oemid",    WORD),
+                ("e_oeminfo",  WORD),
+                ("e_res2",     WORD * 10),
+                #WORD e_res2[10];
+                ("e_lfanew",   WORD),
+                ]
+
+class IMAGE_NT_HEADERS(ctypes.Structure):
+        _fields_ = [
+                ("Signature",   DWORD),
+                #("FileHeader",  IMAGE_FILE_HEADER),
+                #("OptionalHeader",  IMAGE_OPTIONAL_HEADER),
+                ]
+
+pointer_image_dos_header = ctypes.POINTER(IMAGE_DOS_HEADER)
+
+
 kernel32 = ctypes.WinDLL('kernel32.dll', use_last_error=True)
 
 kernel32.OpenProcess.restype = wintypes.HANDLE
+#kernel32.OpenProcess.restype = pointer_image_dos_header
 kernel32.OpenProcess.argtypes = [
     wintypes.DWORD, # dwDesiredAccess
     wintypes.BOOL,  # bInheritHandle
     wintypes.DWORD, # dwProcessId
 ]
+
+kernel32.GetModuleHandleW.restype = wintypes.HMODULE
+kernel32.GetModuleHandleW.argtypes = [wintypes.LPCWSTR]
+
 kernel32.CreateProcessW.restype = wintypes.BOOL
 kernel32.CreateProcessW.argtypes = [
             wintypes.LPCWSTR,   # lpApplicationName
