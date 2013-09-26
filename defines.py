@@ -22,11 +22,14 @@ SIZE_T = ctypes.c_size_t
 WCHAR_SIZE = ctypes.sizeof(wintypes.WCHAR)
 LPSECURITY_ATTRIBUTES = wintypes.LPVOID
 LPTHREAD_START_ROUTINE = wintypes.LPVOID
+BYTE    = ctypes.c_ubyte
 WORD    = ctypes.c_short
 DWORD   = ctypes.c_ulong
 LPBYTE  = ctypes.POINTER(ctypes.c_ubyte)
 LPTSTR  = ctypes.POINTER(ctypes.c_char)
 HANDLE  = ctypes.c_void_p
+
+IMAGE_NUMBEROF_DIRECTORY_ENTRIES = 16
 
 #Struct for CreateProcessA
 class STARTUPINFO(ctypes.Structure):
@@ -83,14 +86,65 @@ class IMAGE_DOS_HEADER(ctypes.Structure):
                 ("e_lfanew",   WORD),
                 ]
 
+class IMAGE_FILE_HEADER(ctypes.Structure):
+        _fields_ = [
+                ("Machine",     WORD),
+                ("NumberOfSections",    WORD),
+                ("TimeDateStamp",       DWORD),
+                ("PointerToSymbolTable",DWORD),
+                ("NumberOfSymbols",     DWORD),
+                ("SizeOfOptionalHeader",WORD),
+                ("Characteristics",     WORD),
+                ]
+
+class IMAGE_DATA_DIRECTORY(ctypes.Structure):
+        _fields_ = [
+                ("VirtualAddress",      DWORD),
+                ("Size",                DWORD),
+                ]
+
+class IMAGE_OPTIONAL_HEADER(ctypes.Structure):
+        _fields_ = [
+                ("Magic",               WORD),
+                ("MajorLinkerVersion",  BYTE),
+                ("MinorLinkerVersion",  BYTE),
+                ("SizeOfCode",          DWORD),
+                ("SizeOfInitializedData",DWORD),
+                ("AddressOfEntryPoint", DWORD),
+                ("BaseOfCode",          DWORD),
+                ("BaseOfData",          DWORD),
+                ("ImageBase",           DWORD),
+                ("SectionAlignment",    DWORD),
+                ("FileAlignment",       DWORD),
+                ("MajorOperatingSystemVersion", WORD),
+                ("MinorOperatingSystemVersion", WORD),
+                ("MajorImageVersion",   WORD),
+                ("MinorImageVersion",   WORD),
+                ("MajorSubSystemVersion",       WORD),
+                ("MinorSubsystemVersion",       WORD),
+                ("Win32VersionValue",   DWORD),
+                ("SizeOfImage",         DWORD),
+                ("SizeOfHeaders",       DWORD),
+                ("CheckSum",            DWORD),
+                ("Subsystem",           WORD),
+                ("DllCharacteristics",  WORD),
+                ("SizeOfStackReserve",  DWORD),
+                ("SizeOfStackCommit",   DWORD),
+                ("SizeOfHeapReserve",   DWORD),
+                ("SizeOfHeapCommit",    DWORD),
+                ("LoaderFlags",         DWORD),
+                ("NumberOfRvaAndSizes", DWORD),
+                ('DataDirectory', IMAGE_DATA_DIRECTORY * IMAGE_NUMBEROF_DIRECTORY_ENTRIES),
+                #IMAGE_DATA_DIRECTORY DataDirectory[IMAGE_NUMBEROF_DIRECTORY_ENTRIES];
+                ]
+
 class IMAGE_NT_HEADERS(ctypes.Structure):
         _fields_ = [
                 ("Signature",   DWORD),
-                #("FileHeader",  IMAGE_FILE_HEADER),
-                #("OptionalHeader",  IMAGE_OPTIONAL_HEADER),
+                ("FileHeader",  IMAGE_FILE_HEADER),
+                ("OptionalHeader",  IMAGE_OPTIONAL_HEADER),
                 ]
 
-pointer_image_dos_header = ctypes.POINTER(IMAGE_DOS_HEADER)
 
 
 kernel32 = ctypes.WinDLL('kernel32.dll', use_last_error=True)

@@ -17,9 +17,14 @@ class debugger():
 
         startupinfo     = STARTUPINFO()
         process_info    = PROCESS_INFORMATION()
-        image_dos_header = IMAGE_DOS_HEADER()
+        #image_dos_header = IMAGE_DOS_HEADER()
+        image_optional_header = IMAGE_OPTIONAL_HEADER()
+        DataDirectory = IMAGE_DATA_DIRECTORY()
 
-        ptr_to_image_dos_header = ctypes.POINTER(IMAGE_DOS_HEADER)
+        pDOSHeader = ctypes.POINTER(IMAGE_DOS_HEADER)
+        pNTHeaders = ctypes.POINTER(IMAGE_NT_HEADERS)
+        pDataDirectory = ctypes.POINTER(IMAGE_DATA_DIRECTORY)
+        pDataDirectory_IAT = ctypes.POINTER(IMAGE_DATA_DIRECTORY)
 
         startupinfo.dwFlags = 0x1
         startupinfo.wShowWindow = 0x0
@@ -114,7 +119,7 @@ class debugger():
             print("[-] error creating the remote thread and injecting the dll " + hThread_Error + " exiting...")
             system.exit(1)
 
-        print("[+] sucessfully created the thread " + str(thread_id.value) + " into process " + str(process_info.dwProcessId) + "\n")
+        print("[+] sucessfully created the thread " + str(thread_id.value) + " in the process " + str(process_info.dwProcessId) + "\n")
 
         print("[+] resuming the injected thread...")
         dwPrevSuspendCount = kernel32.ResumeThread(hThread)
@@ -137,7 +142,22 @@ class debugger():
 
         print("[+] The address for the kernel handle is %s" % hex(hModule))
 
-        ptr_to_image_dos_header = ctypes.cast(hModule, ctypes.POINTER(IMAGE_DOS_HEADER)).contents
+        #IMAGE_DOS_HEADER* pDOSHeader = (IMAGE_DOS_HEADER*)hModule;
+        pDOSHeader = ctypes.cast(hModule, ctypes.POINTER(IMAGE_DOS_HEADER)).contents
+
+        #IMAGE_NT_HEADERS* pNTHeaders =(IMAGE_NT_HEADERS*)((BYTE*)pDOSHeader + pDOSHeader->e_lfanew);
+        e_lfanew_offset = pDOSHeader.e_lfanew
+        #iDOSHeader_base_address = ctypes.cast(pDOSHeader, ctypes.c_int)
+
+        #offset_to_NTHeaders = ctypes.cast(e_lfanew_offset + hModule, ctypes.)
+        offset_to_NTHeaders = e_lfanew_offset + hModule
+        pNTHeaders = ctypes.cast(offset_to_NTHeaders, ctypes.POINTER(IMAGE_NT_HEADERS)).contents
+
+        pImage_NT_Headers = pNTHeaders.OptionalHeader
+        pDataDirectory = pImage_NT_Headers.DataDirectory
+        pDataDirectory_IAT = pDataDirectory[12]
+        #pNTHeaders = ctypes.cast(pDOSHeader + pDOSHeader.e_lfanew, BYTE)
+
 
         print("[+] successfully got the address to the IAT")
 
